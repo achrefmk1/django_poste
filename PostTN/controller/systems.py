@@ -39,8 +39,8 @@ def UpdateSystem(request ,id):
         system_serializer =SystemSerializer(system ,data=system_data)
         if system_serializer.is_valid():
             system_serializer.save()
-            return JsonResponse("Updated Successfully" ,safe=False)
-        return JsonResponse("Failed to Update")
+            return JsonResponse(system_serializer.data)
+        return JsonResponse(system_serializer.errors)
 @csrf_exempt
 def DeleteSystem(request ,id):
     if request.method == 'DELETE':

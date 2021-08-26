@@ -22,6 +22,7 @@ urlpatterns = [
 
     # Agence Urls
     url(r'^agence$', agences.GetAgence),
+    url(r'^cities$', agences.GetCities),
     url(r'^agence/([0-9]+)$', agences.GetAgence),
     url(r'^agence/store$', agences.StoreAgence),
     url(r'^agence/update/([0-9]+)$', agences.UpdateAgence),
@@ -33,6 +34,8 @@ urlpatterns = [
     url(r'^user/store$', users.StoreUser),
     url(r'^user/update/([0-9]+)$', users.UpdateUser),
     url(r'^user/delete/([0-9]+)$', users.DeleteUser),
+    url(r'^agenceuser/([0-9]+)/([0-9]+)$', users.AffectUserToAgence),
+    url(r'^userAgence$', users.GetUserAgence),
 
     # System Urls
     url(r'^system$', systems.GetSystem),

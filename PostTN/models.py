@@ -11,11 +11,13 @@ class Users (models.Model):
     matricule = models.IntegerField()
     password = models.CharField(max_length=100)
     is_chef = models.CharField(max_length=50,default='yes')
+    work_area = models.CharField(max_length=50)
 
 
 class Agence (models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=150)
+    city = models.CharField(max_length=150)
 
 
 class AgenceUsers (models.Model):
@@ -60,3 +62,7 @@ class AgenceAlerts (models.Model):
     fixedDate = models.DateTimeField()
     userID = models.ForeignKey(Users)
     status = models.IntegerField()
+
+
+class Cities (models.Model):
+    city = models.CharField(max_length=150)

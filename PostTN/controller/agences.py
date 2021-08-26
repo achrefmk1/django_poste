@@ -4,8 +4,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 
 from rest_framework.decorators import api_view
-from PostTN.models import Agence
-from PostTN.serializer import AgenceSerializer
+from PostTN.models import Agence,Cities
+from PostTN.serializer import AgenceSerializer,CitiesSerializer
 
 
 @csrf_exempt
@@ -28,7 +28,7 @@ def StoreAgence(request):
         if agence_serializer.is_valid():
             agence_serializer.save()
             return JsonResponse(agence_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(agence_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(agence_serializer, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 @csrf_exempt
 def UpdateAgence(request ,id):
@@ -39,10 +39,19 @@ def UpdateAgence(request ,id):
         if agence_serializer.is_valid():
             agence_serializer.save()
             return JsonResponse("Updated Successfully" ,safe=False)
-        return JsonResponse("Failed to Update")
+        return JsonResponse(agence_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @csrf_exempt
 def DeleteAgence(request ,id):
     if request.method == 'DELETE':
         agence = Agence.objects.get(id=id)
         agence.delete()
         return JsonResponse("Deleted Successfully", safe=False)
+
+
+@csrf_exempt
+def GetCities(request):
+    cities = Cities.objects.all()
+    cities_serializer = CitiesSerializer(cities, many=True)
+    return JsonResponse(cities_serializer.data, safe=False)
+
+
