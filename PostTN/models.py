@@ -66,3 +66,9 @@ class AgenceAlerts (models.Model):
 
 class Cities (models.Model):
     city = models.CharField(max_length=150)
+
+
+class Notification (models.Model):
+    agenceID = models.ForeignKey(Agence)
+    alertID = models.ForeignKey(Alerts)
+    message = models.CharField(max_length=255)

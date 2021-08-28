@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from PostTN.models import Agence,Users,Systems,Alerts,AgenceUsers
+from PostTN.models import Agence, Users, Systems, Alerts, AgenceUsers, AgenceSystems, Notification
 
 
 class AgenceSerializer(serializers.ModelSerializer):
@@ -31,8 +31,22 @@ class CitiesSerializer(serializers.ModelSerializer):
         model=Agence
         fields=('id','city')
 
+
 class AgenceUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgenceUsers
         fields = ('id', 'agenceID', 'userID')
+
+
+class AgenceSystemsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgenceSystems
+        fields = ('id', 'agenceID', 'systemID')
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ('id', 'agenceID', 'systemID', 'message')
+
 
