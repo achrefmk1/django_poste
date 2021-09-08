@@ -16,41 +16,52 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from PostTN.controller import agences, users, systems, alerts
+from rest_framework.authtoken.views import ObtainAuthToken
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     # Agence Urls
-    url(r'^agence$', agences.GetAgence),
-    url(r'^cities$', agences.GetCities),
-    url(r'^agence/([0-9]+)$', agences.GetAgence),
-    url(r'^agence/store$', agences.StoreAgence),
-    url(r'^agence/update/([0-9]+)$', agences.UpdateAgence),
-    url(r'^agence/delete/([0-9]+)$', agences.DeleteAgence),
-    url(r'^agencesystem$', agences.GetSystemsAgence),
-    url(r'^agencesystem/([0-9]+)/([0-9]+)$', agences.AffectSystemToAgence),
-    url(r'^getsystems/([0-9]+)$', agences.getSystemsByAgenceID),
+    url(r'^agence$', agences.GetAgence.as_view()),
+    url(r'^cities$', agences.GetCities.as_view()),
+    url(r'^agence/([0-9]+)$', agences.GetAgence.as_view()),
+    url(r'^agence/store$', agences.StoreAgence.as_view()),
+    url(r'^agence/update/([0-9]+)$', agences.UpdateAgence.as_view()),
+    url(r'^agence/delete/([0-9]+)$', agences.DeleteAgence.as_view()),
+    url(r'^agencesystem$', agences.GetSystemsAgence.as_view()),
+    url(r'^agencesystem/([0-9]+)/([0-9]+)$', agences.AffectSystemToAgence.as_view()),
+    url(r'^getsystems/([0-9]+)$', agences.getSystemsByAgenceID.as_view()),
+
 
     # User Urls
-    url(r'^user$', users.GetUser),
-    url(r'^user/([0-9]+)$', users.GetUser),
-    url(r'^user/store$', users.StoreUser),
-    url(r'^user/update/([0-9]+)$', users.UpdateUser),
-    url(r'^user/delete/([0-9]+)$', users.DeleteUser),
-    url(r'^agenceuser/([0-9]+)/([0-9]+)$', users.AffectUserToAgence),
-    url(r'^userAgence$', users.GetUserAgence),
+    url(r'^user$', users.GetUsers.as_view()),
+    url(r'^user/([0-9]+)$', users.GetUsers.as_view()),
+    url(r'^user/store$', users.StoreUser.as_view()),
+    url(r'^user/update/([0-9]+)$', users.UpdateUser.as_view()),
+    url(r'^user/delete/([0-9]+)$', users.DeleteUser.as_view()),
+    url(r'^agenceuser/([0-9]+)/([0-9]+)$', users.AffectUserToAgence.as_view()),
+    url(r'^userAgence$', users.GetUserAgence.as_view()),
+    url(r'^profile$', users.GetUserInfo.as_view()),
 
     # System Urls
-    url(r'^system$', systems.GetSystem),
-    url(r'^system/([0-9]+)$', systems.GetSystem),
-    url(r'^system/store$', systems.StoreSystem),
-    url(r'^system/update/([0-9]+)$', systems.UpdateSystem),
-    url(r'^system/delete/([0-9]+)$', systems.DeleteSystem),
+    url(r'^system$', systems.GetSystem.as_view()),
+    url(r'^system/([0-9]+)$', systems.GetSystem.as_view()),
+    url(r'^system/store$', systems.StoreSystem.as_view()),
+    url(r'^system/update/([0-9]+)$', systems.UpdateSystem.as_view()),
+    url(r'^system/delete/([0-9]+)$', systems.DeleteSystem.as_view()),
+    url(r'^systemAlerts/([0-9]+)$', systems.GetSystemAlerts.as_view()),
 
     # Alert Urls
-    url(r'^alert$', alerts.GetAlerts),
-    url(r'^alert/([0-9]+)$', alerts.GetAlerts),
-    url(r'^alert/store$', alerts.StoreAlerts),
-    url(r'^alert/update/([0-9]+)$', alerts.UpdateAlerts),
-    url(r'^alert/delete/([0-9]+)$', alerts.DeleteAlerts),
+    url(r'^alert$', alerts.GetAlerts.as_view()),
+    url(r'^alert/([0-9]+)$', alerts.GetAlerts.as_view()),
+    url(r'^alert/store$', alerts.StoreAlerts.as_view()),
+    url(r'^alert/update/([0-9]+)$', alerts.UpdateAlerts.as_view()),
+    url(r'^alert/delete/([0-9]+)$', alerts.DeleteAlerts.as_view()),
+    url(r'^saveNotification/([0-9]+)/([0-9]+)/([0-9]+)$', alerts.SaveNotification.as_view()),
+    url(r'^userNotification$', alerts.GetUserNotification.as_view()),
+    url(r'^UpdateNotification/([0-9]+)/([0-9]+)$', alerts.UpdateNotification.as_view()),
+
+
+
+    url(r'^auth$', ObtainAuthToken.as_view()),
 ]

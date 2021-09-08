@@ -2,66 +2,34 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
 
-class Users (models.Model):
-    name = models.CharField(max_length=100)
-    email = models.CharField(max_length=100)
-    phone = models.IntegerField()
+class UserProfile (models.Model):
     matricule = models.IntegerField()
-    password = models.CharField(max_length=100)
-    is_chef = models.CharField(max_length=50,default='yes')
+    is_chef = models.CharField(max_length=50, default='yes')
     work_area = models.CharField(max_length=50)
+    user = models.OneToOneField(User)
+    phone = models.CharField(max_length=256, blank=True, null=True)
 
 
 class Agence (models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=150)
-
-
-class AgenceUsers (models.Model):
-    agenceID = models.ForeignKey(Agence)
-    userID = models.ForeignKey(Users)
-
-
-class alertType(enumerate):
-    warning = "warning"
-    error = "error"
+    userID = models.OneToOneField(User)
 
 
 class Systems (models.Model):
     name = models.CharField(max_length=100)
-
-class AgenceSystems (models.Model):
-    agenceID = models.ForeignKey(Agence)
-    systemID = models.ForeignKey(Systems)
+    agences = models.ManyToManyField(Agence)
 
 
 class Alerts (models.Model):
     type = models.IntegerField()
     text = models.CharField(max_length=255)
-    chef_only = models.CharField(max_length=50,default='yes')
+    chef_only = models.CharField(max_length=50, default='yes')
     systemID = models.ForeignKey(Systems)
-
-
-class agenceStatus(enumerate):
-    waiting = "waiting"
-    in_progress = "in_progress"
-    done = "done"
-
-    @classmethod
-    def choices(cls):
-        return tuple((i.name, i.value) for i in cls)
-
-
-class AgenceAlerts (models.Model):
-    agenceID = models.ForeignKey(Agence)
-    alertID = models.ForeignKey(Alerts)
-    alertDate = models.DateTimeField()
-    fixedDate = models.DateTimeField()
-    userID = models.ForeignKey(Users)
-    status = models.IntegerField()
 
 
 class Cities (models.Model):
@@ -69,6 +37,12 @@ class Cities (models.Model):
 
 
 class Notification (models.Model):
-    agenceID = models.ForeignKey(Agence)
-    alertID = models.ForeignKey(Alerts)
+    agence = models.ForeignKey(Agence)
+    system = models.ForeignKey(Systems)
+    alert = models.ForeignKey(Alerts)
     message = models.CharField(max_length=255)
+    alertDate = models.DateTimeField()
+    fixedDate = models.DateTimeField()
+    user = models.ForeignKey(User)
+    status = models.IntegerField()
+
