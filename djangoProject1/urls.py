@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^agencesystem$', agences.GetSystemsAgence.as_view()),
     url(r'^agencesystem/([0-9]+)/([0-9]+)$', agences.AffectSystemToAgence.as_view()),
     url(r'^getsystems/([0-9]+)$', agences.getSystemsByAgenceID.as_view()),
+    url(r'^agencesystem/delete/([0-9]+)/([0-9]+)$', agences.removeSystemsByAgenceID.as_view()),
 
 
     # User Urls
@@ -62,6 +63,8 @@ urlpatterns = [
     url(r'^UpdateNotification/([0-9]+)/([0-9]+)$', alerts.UpdateNotification.as_view()),
 
 
+    url(r'^GetInfos$', users.GetInfos.as_view()),
+    url(r'^UpdateUserPassword$', users.UpdateUserPassword.as_view()),
 
     url(r'^auth$', ObtainAuthToken.as_view()),
 ]

@@ -5,8 +5,8 @@ from rest_framework import status
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
-from PostTN.models import Agence, UserProfile
-from PostTN.serializer import UserSerializer, AgenceUsersSerializer,UserProfileSerializer
+from PostTN.models import Agence, UserProfile, Notification
+from PostTN.serializer import UserSerializer, AgenceUsersSerializer,UserProfileSerializer, NotificationSerializer
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 import json
@@ -25,7 +25,7 @@ class GetUsers(APIView):
                 profile = UserProfile.objects.get(user=id)
                 user = {
                     'id': profile.user.id,
-                    'name': profile.user.username,
+                    'name': profile.user.first_name,
                     'email': profile.user.email,
                     'matricule': profile.matricule,
                     'phone': profile.phone,
@@ -39,7 +39,7 @@ class GetUsers(APIView):
                 for profile in profiles:
                     item = {
                         'id': profile.user.id,
-                        'name': profile.user.username,
+                        'name': profile.user.first_name,
                         'email': profile.user.email,
                         'matricule': profile.matricule,
                         'phone': profile.phone,
@@ -56,7 +56,7 @@ class StoreUser(APIView):
     def post(self, request):
         if request.method == 'POST':
             user_data = JSONParser().parse(request)
-            user = User.objects.create_user(user_data['name'], user_data['email'], user_data['password'])
+            user = User.objects.create_user(user_data['matricule'], user_data['email'], user_data['password'], first_name=user_data['name'])
             user.save()
             profile = UserProfile(matricule=user_data['matricule'], phone=user_data['phone'], is_chef=user_data['is_chef'], work_area=user_data['work_area'], user=user)
             profile.save()
@@ -71,7 +71,8 @@ class UpdateUser(APIView):
         if request.method=='PUT':
             user_data = JSONParser().parse(request)
             u = User.objects.get(id=id)
-            u.username = user_data['name']
+            u.username = user_data['matricule']
+            u.first_name = user_data['name']
             u.email = user_data['email']
             u.save()
             profile = UserProfile.objects.get(user=u)
@@ -132,10 +133,75 @@ class GetUserInfo(APIView):
             profile = UserProfile.objects.get(user=auth_user)
             user = {
                 'id': profile.user.id,
-                'name': profile.user.username,
+                'name': profile.user.first_name,
                 'email': profile.user.email,
                 'matricule': profile.matricule,
                 'phone': profile.phone,
                 'is_chef': profile.is_chef,
                 'work_area': profile.work_area}
             return HttpResponse(json.dumps(user), content_type="application/json")
+
+
+class GetInfos(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @csrf_exempt
+    def get(self, request):
+        if request.method == 'GET':
+            user = User.objects.get(username=request.user)
+            profile = UserProfile.objects.get(user=user.id)
+            notifications = []
+            agences = []
+            data = []
+            if profile.is_chef == 'yes':
+                agencesList = Agence.objects.filter(city=profile.work_area)
+                for agence in agencesList:
+                    item = {}
+                    notifications = []
+                    for notification in Notification.objects.filter(agence=agence.id):
+                        item = {
+                            'id': notification.id,
+                            'text': notification.message,
+                            'date': notification.alertDate.strftime('%m/%d/%Y %H:%M:%S'),
+                            'system': notification.system.name,
+                            'systemID': notification.system.id,
+                            'status': notification.status,
+                            'type': notification.alert.type,
+                            'user': notification.agence.id
+                        }
+                        notifications = notifications + [item]
+                    agences = agences + [{'agence': agence.name, 'data':  notifications}]
+                data = [{'chef': 'yes','data':agences}]
+                return HttpResponse(json.dumps(data))
+
+            notificationsList = user.notification_set.all()
+            for notification in notificationsList:
+                item = {
+                    'id': notification.id,
+                    'text': notification.message,
+                    'date': notification.alertDate.strftime('%m/%d/%Y %H:%M:%S'),
+                    'system': notification.system.name,
+                    'systemID': notification.system.id,
+                    'agence': notification.agence.name,
+                    'agenceID': notification.agence.id,
+                    'status': notification.status,
+                    'type': notification.alert.type
+                }
+                notifications = notifications + [item]
+            data = [{'chef': 'no','data':notifications}]
+            return HttpResponse(json.dumps(data))
+
+
+class UpdateUserPassword(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    @csrf_exempt
+    def put(self, request):
+        if request.method=='PUT':
+            user_data = JSONParser().parse(request)
+            user = User.objects.get(username=request.user)
+            if user.check_password(user_data['old_password']):
+                user.set_password(user_data['new_password'])
+                user.save()
+                return JsonResponse("success", safe=False)
+            return JsonResponse("mot de passe incorrecte", safe=False)

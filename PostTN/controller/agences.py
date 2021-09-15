@@ -137,3 +137,14 @@ class getSystemsByAgenceID(APIView):
                 }
                 systems = systems + [item]
             return JsonResponse(systems, safe=False)
+
+
+class removeSystemsByAgenceID(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    @csrf_exempt
+    def delete(self, request , agenceId, systemId):
+        if request.method == 'DELETE':
+            system = Systems.objects.get(id=systemId)
+            agence = Agence.objects.get(id=agenceId)
+            system.agences.remove(agence)
+            return JsonResponse('deleted', safe=False)
