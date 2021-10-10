@@ -140,3 +140,29 @@ class UpdateNotification(APIView):
             notification.status = status
             notification.save()
             return JsonResponse('updated', safe=False)
+
+
+class GetAllNotification(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    @csrf_exempt
+    def get(self, request):
+        if request.method == 'GET':
+            notifications = []
+            agencesList = Agence.objects.all()
+            for agence in agencesList:
+                notificationsList = agence.notification_set.all()
+                for notification in notificationsList:
+                    item = {
+                        'id': notification.id,
+                        'text': notification.message,
+                        'date': notification.alertDate.strftime('%m/%d/%Y %H:%M:%S'),
+                        'system': notification.system.name,
+                        'user': notification.user.first_name,
+                        'matricule': notification.user.username,
+                        'systemID': notification.system.id,
+                        'status': notification.status,
+                        'type': notification.alert.type,
+                        'agence': agence.name
+                    }
+                    notifications = notifications + [item]
+            return HttpResponse(json.dumps(notifications))

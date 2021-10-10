@@ -54,6 +54,7 @@ urlpatterns = [
 
     # Alert Urls
     url(r'^alert$', alerts.GetAlerts.as_view()),
+    url(r'^GetAllNotification$', alerts.GetAllNotification.as_view()),
     url(r'^alert/([0-9]+)$', alerts.GetAlerts.as_view()),
     url(r'^alert/store$', alerts.StoreAlerts.as_view()),
     url(r'^alert/update/([0-9]+)$', alerts.UpdateAlerts.as_view()),
